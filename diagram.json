@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "author": "underscorelior",
+  "editor": "wokwi",
+  "parts": [
+    {
+      "type": "wokwi-pi-pico",
+      "id": "pico",
+      "top": 1004.85,
+      "left": -15.6,
+      "attrs": { "env": "micropython-20220618-v1.19.1" }
+    },
+    { "type": "wokwi-buzzer", "id": "wokwi-buzzer-0", "top": 808.8, "left": -65.4, "attrs": {} },
+    {
+      "type": "wokwi-membrane-keypad",
+      "id": "wokwi-membrane-keypad-0",
+      "top": 727.6,
+      "left": 524,
+      "attrs": {}
+    },
+    { "type": "wokwi-ds1307", "id": "wokwi-ds1307-0", "top": 1069.8, "left": 105.7, "attrs": {} },
+    {
+      "type": "wokwi-lcd1602",
+      "id": "lcd1",
+      "top": 928,
+      "left": 82.4,
+      "attrs": { "pins": "i2c" }
+    },
+    {
+      "type": "wokwi-tm1637-7segment",
+      "id": "wokwi-tm1637-7segment-0",
+      "top": 1142.36,
+      "left": 323.83,
+      "attrs": {}
+    },
+    { "type": "wokwi-analog-joystick", "id": "joystick1", "top": 786.6, "left": 399, "attrs": {} }
+  ],
+  "connections": [
+    [ "wokwi-lcd1602-0:VCC", "pico:VSYS", "red", [ "h0" ] ],
+    [ "wokwi-lcd1602-0:GND", "pico:GND.8", "black", [ "h-48", "v19.2" ] ],
+    [ "wokwi-lcd1602-0:SDA", "pico:GP0", "green", [ "h-28.8", "v-38.2", "h-144" ] ],
+    [ "wokwi-lcd1602-0:SCL", "pico:GP1", "green", [ "v0.3", "h-144", "v-19.2" ] ],
+    [ "lcd1:VCC", "pico:VBUS", "red", [ "h-28.8", "v-47.9" ] ],
+    [ "lcd1:SDA", "pico:GP0", "limegreen", [ "h-19.2", "v0.2", "h-105.6", "v38.4" ] ],
+    [ "lcd1:SCL", "pico:GP1", "blue", [ "h-9.6", "v0.3", "h-105.6", "v38.4" ] ],
+    [ "lcd1:GND", "pico:GND.8", "black", [ "h-9.6", "v105.6" ] ]
+  ],
+  "dependencies": {}
+}
