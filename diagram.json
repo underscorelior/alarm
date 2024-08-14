@@ -10,7 +10,14 @@
       "left": -15.6,
       "attrs": { "env": "micropython-20220618-v1.19.1" }
     },
-    { "type": "wokwi-buzzer", "id": "wokwi-buzzer-0", "top": 885.6, "left": -190.2, "attrs": {} },
+    {
+      "type": "wokwi-buzzer",
+      "id": "wokwi-buzzer-0",
+      "top": 1157.1,
+      "left": -117.9,
+      "rotate": 270,
+      "attrs": {}
+    },
     {
       "type": "wokwi-membrane-keypad",
       "id": "wokwi-membrane-keypad-0",
@@ -57,7 +64,9 @@
     [ "wokwi-tm1637-7segment-0:GND", "pico:GND.3", "black", [ "h9.6", "v19.2" ] ],
     [ "wokwi-tm1637-7segment-0:VCC", "pico:3V3", "red", [ "h9.6", "v-105.6", "h105.6", "v57.6" ] ],
     [ "wokwi-tm1637-7segment-0:DIO", "pico:GP4", "limegreen", [ "h19.2", "v-9.6" ] ],
-    [ "wokwi-tm1637-7segment-0:CLK", "pico:GP5", "blue", [ "h28.8", "v-9.6" ] ]
+    [ "wokwi-tm1637-7segment-0:CLK", "pico:GP5", "blue", [ "h28.8", "v-9.6" ] ],
+    [ "wokwi-buzzer-0:2", "pico:GP15", "red", [ "h0" ] ],
+    [ "wokwi-buzzer-0:1", "pico:GND.4", "black", [ "h9.6", "v-28.8" ] ]
   ],
   "dependencies": {}
 }
