@@ -10,15 +10,15 @@
       "left": -15.6,
       "attrs": { "env": "micropython-20220618-v1.19.1" }
     },
-    { "type": "wokwi-buzzer", "id": "wokwi-buzzer-0", "top": 808.8, "left": -65.4, "attrs": {} },
+    { "type": "wokwi-buzzer", "id": "wokwi-buzzer-0", "top": 885.6, "left": -190.2, "attrs": {} },
     {
       "type": "wokwi-membrane-keypad",
       "id": "wokwi-membrane-keypad-0",
-      "top": 727.6,
-      "left": 524,
+      "top": 554.8,
+      "left": 24.8,
       "attrs": {}
     },
-    { "type": "wokwi-ds1307", "id": "wokwi-ds1307-0", "top": 1069.8, "left": 105.7, "attrs": {} },
+    { "type": "wokwi-ds1307", "id": "wokwi-ds1307-0", "top": 1069.8, "left": 86.5, "attrs": {} },
     {
       "type": "wokwi-lcd1602",
       "id": "lcd1",
@@ -29,11 +29,17 @@
     {
       "type": "wokwi-tm1637-7segment",
       "id": "wokwi-tm1637-7segment-0",
-      "top": 1142.36,
-      "left": 323.83,
+      "top": 1055.96,
+      "left": -223.37,
       "attrs": {}
     },
-    { "type": "wokwi-analog-joystick", "id": "joystick1", "top": 786.6, "left": 399, "attrs": {} }
+    {
+      "type": "wokwi-analog-joystick",
+      "id": "joystick1",
+      "top": 1026.6,
+      "left": 399,
+      "attrs": {}
+    }
   ],
   "connections": [
     [ "wokwi-lcd1602-0:VCC", "pico:VSYS", "red", [ "h0" ] ],
@@ -43,7 +49,15 @@
     [ "lcd1:VCC", "pico:VBUS", "red", [ "h-28.8", "v-47.9" ] ],
     [ "lcd1:SDA", "pico:GP0", "limegreen", [ "h-19.2", "v0.2", "h-105.6", "v38.4" ] ],
     [ "lcd1:SCL", "pico:GP1", "blue", [ "h-9.6", "v0.3", "h-105.6", "v38.4" ] ],
-    [ "lcd1:GND", "pico:GND.8", "black", [ "h-9.6", "v105.6" ] ]
+    [ "lcd1:GND", "pico:GND.8", "black", [ "h-9.6", "v105.6" ] ],
+    [ "wokwi-ds1307-0:GND", "pico:GND.7", "black", [ "h-19.2", "v-9.6" ] ],
+    [ "wokwi-ds1307-0:5V", "pico:3V3", "red", [ "h-19.2", "v-38.8" ] ],
+    [ "wokwi-ds1307-0:SCL", "pico:GP27", "blue", [ "h-28.8", "v-19.4" ] ],
+    [ "wokwi-ds1307-0:SDA", "pico:GP26", "limegreen", [ "h0" ] ],
+    [ "wokwi-tm1637-7segment-0:GND", "pico:GND.3", "black", [ "h9.6", "v19.2" ] ],
+    [ "wokwi-tm1637-7segment-0:VCC", "pico:3V3", "red", [ "h9.6", "v-105.6", "h105.6", "v57.6" ] ],
+    [ "wokwi-tm1637-7segment-0:DIO", "pico:GP4", "limegreen", [ "h19.2", "v-9.6" ] ],
+    [ "wokwi-tm1637-7segment-0:CLK", "pico:GP5", "blue", [ "h28.8", "v-9.6" ] ]
   ],
   "dependencies": {}
 }
