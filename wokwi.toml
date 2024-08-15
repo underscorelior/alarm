@@ -1,0 +1,4 @@
+[wokwi]
+version = 1
+firmware = 'RPI_PICO-20240602-v1.23.0.uf2'
+elf = 'path-to-your-firmware.elf'
