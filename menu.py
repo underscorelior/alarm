@@ -1,6 +1,21 @@
 import random
 
 
+def is_weekday(dt):
+    year = dt[0]
+    month = dt[1]
+    day = dt[2]
+
+    if month < 3:
+        month += 12
+        year -= 1
+
+    k = year % 100
+    j = year // 100
+    h = (day + ((13 * (month + 1)) // 5) + k + (k // 4) + (j // 4) - (2 * j)) % 7
+    return h > 1
+
+
 def sel_chr(num, options, sel, char=chr(0), other=" "):
     return (char if sel == num else other) + options[num]
 
@@ -10,7 +25,6 @@ def space_between(str1, str2, spacer=" ", length=16):
     return str1 + spacing + str2
 
 
-# Options should be a dict, where key is the text to display and value is the Menu object for the next
 class MainMenu:
     def __init__(self, display, options):
         self.display = display
@@ -26,10 +40,10 @@ class MainMenu:
         lcd = self.display
 
         lcd.clear()
+        lcd.putstr("Alarm Settings".center(16))
         lcd.putstr(space_between(sel_chr(0, opts, sel), sel_chr(1, opts, sel)))
-        lcd.putstr(sel_chr(2, opts, sel))
 
-    def handle_joystick(self, horizontal, vertical):
+    def handle_joystick(self, horizontal, _):
         sel = self.selected
 
         rerender = False
@@ -37,17 +51,13 @@ class MainMenu:
         if horizontal != -1:
             if sel // 2 == 0:
                 sel = horizontal
-                # else:
-                # sel = horizontal+2 # There is no 4th option ATM, so if this case is met, do nothing
 
                 rerender = True
 
-        if vertical != -1:
-            if sel % 2 == 0:
-                sel = vertical * 2
-                # else:
-                # sel = vertical*2+1 # There is no 4th option ATM, so if this case is met, do nothing
-                rerender = True
+        # if vertical != -1:
+        #     if sel % 2 == 0:
+        #         sel = vertical * 2
+        #         rerender = True
 
         if sel == self.selected:
             rerender = False
@@ -208,41 +218,44 @@ class Game:
             lcd.putstr("Wrong! Resetting")
 
     def next_question(self, dt):
-        seed = int((dt[0] - (dt[1] / (dt[2] + 1))) * (dt[4] - dt[5] / (dt[6] + 1)))
-        random.seed(seed)
+        try:
+            seed = int((dt[0] - (dt[1] / (dt[2] + 1))) * (dt[4] - dt[5] / (dt[6] + 1)))
+            random.seed(seed)
 
-        op = random.choice(["+", "-", "*", "/", "**"])
+            op = random.choice(["+", "-", "*", "/", "**"])
 
-        if op in ["+", "-"]:
-            a = random.randint(1, 100)
-            b = random.randint(1, 100 - a)
-        elif op == "*":
-            a = random.randint(1, 50)
-            b = random.randint(1, 50 // a)
-        elif op == "/":
-            a = random.randint(1, 50)
-            b = random.randint(1, 50 // a)
-            if b == 0:
-                b = 1
-        elif op == "**":
-            a = random.randint(1, 9)
-            b = random.randint(1, 4)
+            if op in ["+", "-"]:
+                a = random.randint(1, 100)
+                b = random.randint(1, 100 - a)
+            elif op == "*":
+                a = random.randint(1, 50)
+                b = random.randint(1, 50 // a)
+            elif op == "/":
+                a = random.randint(1, 50)
+                b = random.randint(1, 50 // a)
+                if b == 0:
+                    b = 1
+            elif op == "**":
+                a = random.randint(1, 9)
+                b = random.randint(1, 4)
 
-        question = f"({a}{op}{b})"
+            question = f"({a}{op}{b})"
 
-        result = int(eval(question))
+            result = int(eval(question))
 
-        random.seed(seed ** random.randint(0, 10))
+            random.seed(seed ** random.randint(0, 10))
 
-        add_op = random.choice(["+", "/"])
-        if add_op == "+":
-            b = random.randint(1, 100 - result)
-        else:
-            b = random.randint(1, 6)
-            if b == 0:
-                b = 1
+            add_op = random.choice(["+", "/"])
+            if add_op == "+":
+                b = random.randint(1, 100 - result)
+            else:
+                b = random.randint(1, 6)
+                if b == 0:
+                    b = 1
 
-        question += f"{add_op}{b}"
+            question += f"{add_op}{b}"
+        except Exception:
+            question = "(1+1)/1"
 
         self.ipt = ""
         self.question = question

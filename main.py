@@ -3,7 +3,7 @@ from time import sleep
 from pico_i2c_lcd import I2cLcd
 import ds1307
 import tm1637
-from menu import MainMenu, SettingsMenu, SkipMenu, AlarmMenu, Game
+from menu import MainMenu, SettingsMenu, SkipMenu, AlarmMenu, Game, is_weekday
 
 #### SETUP DEVICES ####
 i2c = I2C(0, sda=Pin(0), scl=Pin(1), freq=400000)
@@ -32,7 +32,6 @@ for x in range(0, 4):
 
 for x in range(0, 4):
     col_list[x] = Pin(col_list[x], Pin.IN, Pin.PULL_UP)
-
 
 key_map = [
     ["D", "#", "0", "*"],
@@ -125,22 +124,33 @@ colon = 0
 skip_days = []
 menu = mainmenu
 sel_sev = 0
-alarm = 765  # In seconds
+alarm = 420  # In seconds
+mute = False
 
 menu.draw_menu()
 
 while True:
     dt = rtc.datetimeRTC
+
     curr_time = dt[4] * 60 + dt[5]
     key = Keypad4x4Read(col_list, row_list)
 
-    if alarm <= curr_time <= alarm + 60 and f"{dt[0]}{dt[1]}{dt[2]}" not in skip_days:
-        play_alarm(colon)
+    if (
+        alarm <= curr_time <= alarm + 60
+        and f"{dt[0]}{dt[1]}{dt[2]}" not in skip_days
+        and is_weekday(dt)
+    ):
+        if not mute:
+            play_alarm(colon)
         if type(menu) is not Game:
             menu = Game(lcd)
             menu.next_question(rtc.datetimeRTC)
             menu.draw()
+            mute = False
         else:
+            if handle_horiz() != -1 or handle_vert() != -1 or handle_press():
+                mute = True
+                buzzer.duty_u16(0)
             if key is not None:
                 menu.input_keys(key, dt)
             if menu.check_comp():
@@ -191,9 +201,6 @@ while True:
 
             rerender = False
 
-        # if key != None:
-        #     print("Pressed button: " + key)
-
         if rerender:
             menu.draw_menu()
 
@@ -201,30 +208,3 @@ while True:
     sleep(0.25)
     colon = (colon + 1) % 8
     rerender = False
-
-    #### IDEAS ####
-    # Menu:
-    ## Change -> Used for changing time
-    ## Shows up on the 4 digit maybe, and if you go vertically with joystick it allows you to change it up or down.
-    ## If you go horiz it changes HH to MM and vice versa.
-    ## Indicates which is used by blinking the one that is being edited
-    ## Asks if it is for one day or a permanent change
-    ## Skip -> Skips next day
-    ## Asks for confirmation
-    ## Settings:
-    ## Allows you to change the variables related to the game
-    ## Change the volume of the alarm clock, with a preview sound playing
-    ## Change the days it is active on, like below
-    """
-      M T W T F S S
-      ^   ^   ^   ^ 
-    """
-
-# Game:
-## Picks between 3 games randomly:
-## Math:
-## Puts a customizable amount of math problems to be solved.
-## Capitals:
-## Guess country capital with the abcd of the keypad.
-## Memory:
-## Shows arrows on the LCD, you are required to memorize and do with joystick.
