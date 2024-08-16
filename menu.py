@@ -53,7 +53,7 @@ class MainMenu:
 
         return rerender
 
-    def handle_press(self, press, _):
+    def handle_press(self, press):
         if press:
             return self.options[list(self.options.keys())[self.selected]]
         return False
@@ -70,27 +70,34 @@ class SkipMenu:
     def reset(self):
         self.selected = 0
 
-    def set_skips(self, skip_days):
+    def set_skips(self, skip_days, date):
         self.skips = skip_days
-        self.skips
+        self.date = date
 
     def draw_menu(self):
         lcd = self.display
         sel = self.selected
         opt = self.options
-
         lcd.clear()
+
+        if self.date in self.skips:
+            self.selected = 1
+            sel = 1
+            lcd.putstr("Already Skipped!")
+            lcd.putstr("{:>16}".format(sel_chr(1, opt, sel)))
+            return
+
         lcd.putstr("Skip Next Alarm".center(16))
         lcd.putstr(sel_chr(0, opt, sel) + " " * 3 + sel_chr(1, opt, sel))
 
-    def handle_joystick(self, horizontal, vertical):
+    def handle_joystick(self, horizontal, _):
         sel = self.selected
 
         rerender = False
-
-        if horizontal != -1:
-            sel = (sel - 1 + (horizontal * 2)) % 2
-            rerender = True
+        if self.date not in self.skips:
+            if horizontal != -1:
+                sel = (sel - 1 + (horizontal * 2)) % 2
+                rerender = True
 
         if sel == self.selected:
             rerender = False
@@ -99,10 +106,36 @@ class SkipMenu:
 
         return rerender
 
-    def handle_press(self, press, main):
+    def handle_press(self, press):
         if press and self.selected == 1:
-            return main
+            return True, 1
         if press and self.selected == 0:
+            return True, 0
+        return False, False
+
+
+class AlarmMenu:
+    def __init__(self, display):
+        self.display = display
+        self.options = ["Save"]
+
+    def set_skips(self, skip_days, date):
+        self.skips = skip_days
+        self.date = date
+
+    def draw_menu(self):
+        lcd = self.display
+        opt = self.options
+        lcd.clear()
+
+        lcd.putstr("Editing Alarm".center(16))
+        lcd.putstr(sel_chr(0, opt, 0))
+
+    def handle_joystick(self, horizontal, vertical):
+        return horizontal != -1, vertical
+
+    def handle_press(self, press):
+        if press:
             return True
         return False
 
