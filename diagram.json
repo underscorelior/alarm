@@ -1,85 +1,133 @@
 {
-  "version": 1,
-  "author": "underscorelior",
-  "editor": "wokwi",
-  "parts": [
-    {
-      "type": "wokwi-pi-pico",
-      "id": "pico",
-      "top": 1004.85,
-      "left": -15.6,
-      "attrs": { "env": "micropython-20220618-v1.19.1" }
-    },
-    {
-      "type": "wokwi-buzzer",
-      "id": "wokwi-buzzer-0",
-      "top": 1219.2,
-      "left": -48,
-      "rotate": 180,
-      "attrs": {}
-    },
-    {
-      "type": "wokwi-membrane-keypad",
-      "id": "wokwi-membrane-keypad-0",
-      "top": 554.8,
-      "left": 24.8,
-      "attrs": {}
-    },
-    {
-      "type": "wokwi-ds1307",
-      "id": "wokwi-ds1307-0",
-      "top": 1140.6,
-      "left": -146.1,
-      "rotate": 180,
-      "attrs": {}
-    },
-    {
-      "type": "wokwi-lcd1602",
-      "id": "lcd1",
-      "top": 928,
-      "left": 82.4,
-      "attrs": { "pins": "i2c" }
-    },
-    {
-      "type": "wokwi-tm1637-7segment",
-      "id": "wokwi-tm1637-7segment-0",
-      "top": 1046.36,
-      "left": -213.77,
-      "attrs": {}
-    },
-    {
-      "type": "wokwi-analog-joystick",
-      "id": "joystick1",
-      "top": 1062.5,
-      "left": 100.3,
-      "rotate": 90,
-      "attrs": {}
-    }
-  ],
-  "connections": [
-    [ "wokwi-lcd1602-0:VCC", "pico:VSYS", "red", [ "h0" ] ],
-    [ "wokwi-lcd1602-0:GND", "pico:GND.8", "black", [ "h-48", "v19.2" ] ],
-    [ "wokwi-lcd1602-0:SDA", "pico:GP0", "green", [ "h-28.8", "v-38.2", "h-144" ] ],
-    [ "wokwi-lcd1602-0:SCL", "pico:GP1", "green", [ "v0.3", "h-144", "v-19.2" ] ],
-    [ "lcd1:VCC", "pico:VBUS", "red", [ "h-19.2", "v48.1" ] ],
-    [ "lcd1:SDA", "pico:GP0", "limegreen", [ "h-19.2", "v0.2", "h-105.6", "v38.4" ] ],
-    [ "lcd1:SCL", "pico:GP1", "blue", [ "h-9.6", "v0.3", "h-105.6", "v38.4" ] ],
-    [ "lcd1:GND", "pico:GND.8", "black", [ "h-9.6", "v105.6" ] ],
-    [ "wokwi-tm1637-7segment-0:GND", "pico:GND.3", "black", [ "h9.6", "v19.2" ] ],
-    [ "wokwi-tm1637-7segment-0:VCC", "pico:3V3", "red", [ "h19.2", "v-96", "h96", "v57.6" ] ],
-    [ "wokwi-tm1637-7segment-0:DIO", "pico:GP4", "limegreen", [ "h19.2", "v-9.6" ] ],
-    [ "wokwi-tm1637-7segment-0:CLK", "pico:GP5", "blue", [ "h28.8", "v-9.6" ] ],
-    [ "wokwi-buzzer-0:2", "pico:GP15", "red", [ "h0" ] ],
-    [ "wokwi-ds1307-0:GND", "pico:GND.3", "black", [ "h28.8", "v-76.8" ] ],
-    [ "wokwi-ds1307-0:5V", "pico:3V3", "red", [ "h9.6", "v-201.2", "h124.8", "v57.6" ] ],
-    [ "wokwi-ds1307-0:SDA", "pico:GP10", "limegreen", [ "h38.4", "v-47.7" ] ],
-    [ "wokwi-ds1307-0:SCL", "pico:GP11", "blue", [ "h28.8", "v-28.6" ] ],
-    [ "wokwi-buzzer-0:1", "pico:GND.4", "black", [ "v-9.6", "h-19.2", "v-19.2", "h0", "v-9.6" ] ],
-    [ "joystick1:GND", "pico:GND.6", "black", [ "h-28.8", "v-9.6" ] ],
-    [ "joystick1:SEL", "pico:GP16", "orange", [ "h-19.2", "v67.2" ] ],
-    [ "joystick1:HORZ", "pico:GP26", "limegreen", [ "h-28.8", "v-19.2" ] ],
-    [ "joystick1:VERT", "pico:GP27", "blue", [ "h-19.2", "v-19.2" ] ],
-    [ "joystick1:VCC", "pico:3V3", "red", [ "h-9.6", "v-48" ] ]
-  ],
-  "dependencies": {}
+	"version": 1,
+	"author": "underscorelior",
+	"editor": "wokwi",
+	"parts": [
+		{
+			"type": "wokwi-pi-pico",
+			"id": "pico",
+			"top": 1004.85,
+			"left": -15.6,
+			"attrs": { "env": "micropython-20220618-v1.19.1" }
+		},
+		{
+			"type": "wokwi-buzzer",
+			"id": "wokwi-buzzer-0",
+			"top": 1219.2,
+			"left": 28.8,
+			"rotate": 180,
+			"attrs": {}
+		},
+		{
+			"type": "wokwi-membrane-keypad",
+			"id": "wokwi-membrane-keypad-0",
+			"top": 746.8,
+			"left": -464.8,
+			"attrs": {}
+		},
+		{
+			"type": "wokwi-ds1307",
+			"id": "wokwi-ds1307-0",
+			"top": 1159.8,
+			"left": -126.9,
+			"rotate": 180,
+			"attrs": {}
+		},
+		{
+			"type": "wokwi-lcd1602",
+			"id": "lcd1",
+			"top": 928,
+			"left": 82.4,
+			"attrs": { "pins": "i2c" }
+		},
+		{
+			"type": "wokwi-tm1637-7segment",
+			"id": "wokwi-tm1637-7segment-0",
+			"top": 940.76,
+			"left": -232.97,
+			"attrs": {}
+		},
+		{
+			"type": "wokwi-analog-joystick",
+			"id": "joystick1",
+			"top": 1062.5,
+			"left": 100.3,
+			"rotate": 90,
+			"attrs": {}
+		}
+	],
+	"connections": [
+		["wokwi-lcd1602-0:VCC", "pico:VSYS", "red", ["h0"]],
+		["wokwi-lcd1602-0:GND", "pico:GND.8", "black", ["h-48", "v19.2"]],
+		[
+			"wokwi-lcd1602-0:SDA",
+			"pico:GP0",
+			"green",
+			["h-28.8", "v-38.2", "h-144"]
+		],
+		[
+			"wokwi-lcd1602-0:SCL",
+			"pico:GP1",
+			"green",
+			["v0.3", "h-144", "v-19.2"]
+		],
+		["lcd1:VCC", "pico:VBUS", "red", ["h-19.2", "v48.1"]],
+		[
+			"lcd1:SDA",
+			"pico:GP0",
+			"limegreen",
+			["h-19.2", "v-9.4", "h-76.8", "v48"]
+		],
+		["lcd1:SCL", "pico:GP1", "blue", ["h-9.6", "v-9.3", "h-96", "v48"]],
+		["lcd1:GND", "pico:GND.8", "black", ["h-9.6", "v105.6"]],
+		[
+			"wokwi-tm1637-7segment-0:VCC",
+			"pico:3V3",
+			"red",
+			["h134.4", "h0", "v67.2"]
+		],
+		[
+			"wokwi-tm1637-7segment-0:DIO",
+			"pico:GP4",
+			"limegreen",
+			["h19.2", "v86.4"]
+		],
+		["wokwi-ds1307-0:GND", "pico:GND.3", "black", ["h28.8", "v-76.8"]],
+		[
+			"wokwi-ds1307-0:5V",
+			"pico:3V3",
+			"red",
+			["h19.2", "v-220.4", "h115.2", "v57.6"]
+		],
+		["joystick1:GND", "pico:GND.6", "black", ["h-28.8", "v-9.6"]],
+		["joystick1:SEL", "pico:GP16", "orange", ["h-19.2", "v67.2"]],
+		["joystick1:HORZ", "pico:GP26", "limegreen", ["h-28.8", "v-19.2"]],
+		["joystick1:VERT", "pico:GP27", "blue", ["h-19.2", "v-19.2"]],
+		["joystick1:VCC", "pico:3V3", "red", ["h-9.6", "v-48"]],
+		["wokwi-buzzer-0:2", "pico:GP17", "red", ["h0.4", "v-28.8"]],
+		["wokwi-buzzer-0:1", "pico:GND.5", "black", ["v-38.4"]],
+		["wokwi-ds1307-0:SDA", "pico:GP14", "limegreen", ["h0"]],
+		["wokwi-ds1307-0:SCL", "pico:GP15", "blue", ["h38.4", "v19.4"]],
+		[
+			"pico:GP5",
+			"wokwi-tm1637-7segment-0:CLK",
+			"blue",
+			["h-19.2", "v-28.8"]
+		],
+		["wokwi-tm1637-7segment-0:GND", "pico:GND.1", "black", ["h0", "v38.4"]],
+		["wokwi-membrane-keypad-0:C4", "pico:GP6", "green", ["v0"]],
+		["wokwi-membrane-keypad-0:C3", "pico:GP7", "green", ["v0"]],
+		["wokwi-membrane-keypad-0:C2", "pico:GP8", "green", ["v0"]],
+		["wokwi-membrane-keypad-0:C1", "pico:GP9", "green", ["v0"]],
+		["wokwi-membrane-keypad-0:R4", "pico:GP10", "green", ["v0"]],
+		["wokwi-membrane-keypad-0:R3", "pico:GP11", "green", ["v0"]],
+		[
+			"wokwi-membrane-keypad-0:R2",
+			"pico:GP12",
+			"green",
+			["v67.2", "h-0.4", "v9.6"]
+		],
+		["wokwi-membrane-keypad-0:R1", "pico:GP13", "green", ["v0"]]
+	],
+	"dependencies": {}
 }
