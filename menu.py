@@ -188,52 +188,89 @@ class SettingsMenu:
 class Game:
     def __init__(self, display):
         self.display = display
-        self.question_num = 1
+        self.question_num = 0
         self.question = ""
         self.ipt = ""
+        self.warn = False
 
     def draw(self):
         lcd = self.display
 
         lcd.clear()
-        lcd.putstr("{:<16}".format(f"Question {self.question_num}."))
-        lcd.putstr(space_between(self.question.replace("**", "^"), self.ipt))
 
-    def generate_question(self, dt):
-        seed = int((dt[0] * (dt[1] / dt[2])) ** (dt[4] + dt[5] / dt[6]))
+        lcd.putstr("{:<16}".format(f"Question {self.question_num}."))
+
+        if not self.warn:
+            lcd.putstr(
+                space_between((self.question.replace("**", "^") + " = "), self.ipt[-2:])
+            )
+        else:
+            lcd.putstr("Wrong! Resetting")
+
+    def next_question(self, dt):
+        seed = int((dt[0] - (dt[1] / (dt[2] + 1))) * (dt[4] - dt[5] / (dt[6] + 1)))
         random.seed(seed)
 
-        print(seed)
+        op = random.choice(["+", "-", "*", "/", "**"])
 
-        sel_op = random.choice(["+", "-", "*", "/", "^"])
-        if sel_op == "+" or sel_op == "-":
+        if op in ["+", "-"]:
             a = random.randint(1, 100)
-            b = random.randint(1, 99 - a)
-            self.question = f"{a}{sel_op}{b}"
-        elif sel_op == "*":
+            b = random.randint(1, 100 - a)
+        elif op == "*":
             a = random.randint(1, 50)
-            b = random.randint(1, 50 - a)
-            self.question = f"{a}{sel_op}{b}"
-        elif sel_op == "/":
+            b = random.randint(1, 50 // a)
+        elif op == "/":
             a = random.randint(1, 50)
-            b = random.randint(1, 50 - a)
-            self.question = f"{a}{sel_op}{b}"
-        else:
+            b = random.randint(1, 50 // a)
+            if b == 0:
+                b = 1
+        elif op == "**":
             a = random.randint(1, 9)
-            b = random.randint(1, 4 - a // 4)
-            self.question = f"{a}**{b}"
+            b = random.randint(1, 4)
 
-        print(self.question, int(eval(self.question)))
+        question = f"({a}{op}{b})"
 
-        random.seed(
-            seed ** random.randint(random.randint(0, 10), random.randint(10, 20))
-        )
-        sel_op = random.choice(["+", "-", "/"])
-        if sel_op == "+" or sel_op == "-":
-            b = random.randint(1, 99 - int(eval(self.question)))
-            self.question += f"{sel_op}{b}"
+        result = int(eval(question))
+
+        random.seed(seed ** random.randint(0, 10))
+
+        add_op = random.choice(["+", "/"])
+        if add_op == "+":
+            b = random.randint(1, 100 - result)
         else:
-            b = random.randint(1, 15 - int(eval(self.question)))
-            self.question += f"{sel_op}{b}"
+            b = random.randint(1, 6)
+            if b == 0:
+                b = 1
 
-        print(f"{self.question} {int(eval(self.question))}")
+        question += f"{add_op}{b}"
+
+        self.ipt = ""
+        self.question = question
+        self.question_num += 1
+
+        print(f"{question} = {int(eval(question))}")
+
+    def input_keys(self, key, dt):
+        if key in ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]:
+            self.ipt += key
+            self.draw()
+        elif key == "*":
+            self.ipt = ""
+            self.warn = False
+            self.draw()
+        else:
+            self.submit_ans(dt)
+
+    def submit_ans(self, dt):
+        if len(self.ipt) != 0 and int(eval(self.question)) == int(self.ipt[-3:]):
+            self.next_question(dt)
+            if self.question_num != 4:
+                self.draw()
+        else:
+            self.warn = True
+            self.draw()
+
+    def check_comp(self):
+        if self.question_num == 4:
+            return True
+        return False

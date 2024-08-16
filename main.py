@@ -20,7 +20,7 @@ joystick = (ADC(Pin(27)), ADC(Pin(26)), Pin(16, Pin.IN, Pin.PULL_UP))
 
 lcd.custom_char(0, bytearray([0x00, 0x08, 0x0C, 0x0E, 0x0E, 0x0C, 0x08, 0x00]))
 
-sleep(2)
+sleep(1)
 
 #### KEYPAD ####
 col_list = [6, 7, 8, 9]
@@ -125,26 +125,32 @@ colon = 0
 skip_days = []
 menu = mainmenu
 sel_sev = 0
-alarm = 420  # In seconds
+alarm = 765  # In seconds
 
 menu.draw_menu()
 
 while True:
     dt = rtc.datetimeRTC
     curr_time = dt[4] * 60 + dt[5]
-    # if alarm <= curr_time <= alarm + 60 and f"{dt[0]}{dt[1]}{dt[2]}" not in skip_days:
-    if True:
+    key = Keypad4x4Read(col_list, row_list)
+
+    if alarm <= curr_time <= alarm + 60 and f"{dt[0]}{dt[1]}{dt[2]}" not in skip_days:
         play_alarm(colon)
         if type(menu) is not Game:
             menu = Game(lcd)
-            menu.generate_question(rtc.datetimeRTC)
+            menu.next_question(rtc.datetimeRTC)
             menu.draw()
         else:
-            pass
+            if key is not None:
+                menu.input_keys(key, dt)
+            if menu.check_comp():
+                skip_days.append(f"{dt[0]}{dt[1]}{dt[2]}")
+                menu = mainmenu
+                menu.draw_menu()
+                buzzer.duty_u16(0)
 
     else:
         rerender = menu.handle_joystick(handle_horiz(), handle_vert())
-        key = Keypad4x4Read(col_list, row_list)
 
         if type(menu) is MainMenu:
             new = menu.handle_press(handle_press())
