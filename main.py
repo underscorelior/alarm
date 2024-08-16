@@ -3,7 +3,7 @@ from time import sleep
 from pico_i2c_lcd import I2cLcd
 import ds1307
 import tm1637
-from menu import MainMenu, SettingsMenu, SkipMenu, AlarmMenu
+from menu import MainMenu, SettingsMenu, SkipMenu, AlarmMenu, Game
 
 #### SETUP DEVICES ####
 i2c = I2C(0, sda=Pin(0), scl=Pin(1), freq=400000)
@@ -19,6 +19,8 @@ buzzer = PWM(Pin(17))
 joystick = (ADC(Pin(27)), ADC(Pin(26)), Pin(16, Pin.IN, Pin.PULL_UP))
 
 lcd.custom_char(0, bytearray([0x00, 0x08, 0x0C, 0x0E, 0x0E, 0x0C, 0x08, 0x00]))
+
+sleep(2)
 
 #### KEYPAD ####
 col_list = [6, 7, 8, 9]
@@ -53,24 +55,30 @@ def Keypad4x4Read(cols, rows):
 
 #### 7SEG DISPLAY + ALARM ####
 def display_time(dt, blink=False, sel=0, alarm=0):
-    if sel:
-        alarm = [alarm // 60, alarm % 60]
     if not sel:
         sevseg.show(f"{dt[4]:02d}{dt[5]:02d}", blink)
-    elif sel == 1:  # Left side (HH)
-        if blink:
-            sevseg.show(f"  {alarm[1]:02d}", True)
+    else:
+        alarm = [alarm // 60, alarm % 60]
+
+        if sel == 1:  # Left side (HH)
+            if blink:
+                sevseg.show(f"  {alarm[1]:02d}", True)
+            else:
+                sevseg.show(f"{alarm[0]:02d}{alarm[1]:02d}", True)
         else:
-            sevseg.show(f"{alarm[0]:02d}{alarm[1]:02d}", True)
-    elif sel == 2:
-        if blink:
-            sevseg.show(f"{alarm[0]:02d}  ", True)
-        else:
-            sevseg.show(f"{alarm[0]:02d}{alarm[1]:02d}", True)
+            if blink:
+                sevseg.show(f"{alarm[0]:02d}  ", True)
+            else:
+                sevseg.show(f"{alarm[0]:02d}{alarm[1]:02d}", True)
 
 
-def manage_alarm(dt):
-    pass
+def play_alarm(play):
+    buzzer.freq(500)
+
+    if play % 2:
+        buzzer.duty_u16(1000)
+    else:
+        buzzer.duty_u16(0)
 
 
 #### JOYSTICK ####
@@ -123,69 +131,81 @@ menu.draw_menu()
 
 while True:
     dt = rtc.datetimeRTC
-    rerender = menu.handle_joystick(handle_horiz(), handle_vert())
-    key = Keypad4x4Read(col_list, row_list)
+    curr_time = dt[4] * 60 + dt[5]
+    # if alarm <= curr_time <= alarm + 60 and f"{dt[0]}{dt[1]}{dt[2]}" not in skip_days:
+    if True:
+        play_alarm(colon)
+        if type(menu) is not Game:
+            menu = Game(lcd)
+            menu.generate_question(rtc.datetimeRTC)
+            menu.draw()
+        else:
+            pass
 
-    if type(menu) is MainMenu:
-        new = menu.handle_press(handle_press())
-        if new:
-            menu.reset()
-            menu = new
-            if type(menu) is SkipMenu:
-                menu.set_skips(skip_days, f"{dt[0]}{dt[1]}{dt[2]+1}")
-            menu.draw_menu()
-    elif type(menu) is SkipMenu:
-        info = menu.handle_press(handle_press())
+    else:
+        rerender = menu.handle_joystick(handle_horiz(), handle_vert())
+        key = Keypad4x4Read(col_list, row_list)
 
-        if info[0]:
-            if info[1]:
+        if type(menu) is MainMenu:
+            new = menu.handle_press(handle_press())
+            if new:
                 menu.reset()
+                menu = new
+                if type(menu) is SkipMenu:
+                    menu.set_skips(skip_days, f"{dt[0]}{dt[1]}{dt[2]+1}")
+                menu.draw_menu()
+        elif type(menu) is SkipMenu:
+            info = menu.handle_press(handle_press())
+
+            if info[0]:
+                if info[1]:
+                    menu.reset()
+                    menu = mainmenu
+                    menu.draw_menu()
+                else:
+                    skip_days.append(f"{dt[0]}{dt[1]}{dt[2]+1}")
+                    menu.reset()
+                    menu = mainmenu
+                    menu.draw_menu()
+        elif type(menu) is AlarmMenu:
+            if not sel_sev:
+                sel_sev = 1
+            if rerender[0]:
+                sel_sev = sel_sev % 2 + 1
+
+            if handle_vert() == 0:
+                alarm = (alarm + (5 if (sel_sev - 1) else 60)) % 1440
+            elif handle_vert() == 1:
+                alarm = (alarm - (5 if (sel_sev - 1) else 60)) % 1440
+
+            if menu.handle_press(handle_press()):
+                sel_sev = 0
                 menu = mainmenu
                 menu.draw_menu()
-            else:
-                skip_days.append(f"{dt[0]}{dt[1]}{dt[2]+1}")
-                menu.reset()
-                menu = mainmenu
-                menu.draw_menu()
-    elif type(menu) is AlarmMenu:
-        if not sel_sev:
-            sel_sev = 1
-        if rerender[0]:
-            sel_sev = sel_sev % 2 + 1
 
-        if handle_vert() == 0:
-            alarm = (alarm + (5 if (sel_sev - 1) else 60)) % 1440
-        elif handle_vert() == 1:
-            alarm = (alarm - (5 if (sel_sev - 1) else 60)) % 1440
+            rerender = False
 
-        if menu.handle_press(handle_press()):
-            sel_sev = 0
-            menu = mainmenu
+        # if key != None:
+        #     print("Pressed button: " + key)
+
+        if rerender:
             menu.draw_menu()
-
-        rerender = False
-
-    # if key != None:
-    #     print("Pressed button: " + key)
-
-    if rerender:
-        menu.draw_menu()
 
     display_time(dt, colon > 3, sel_sev, alarm)
     sleep(0.25)
     colon = (colon + 1) % 8
     rerender = False
 
-#### IDEAS ####
-# Menu:
-## Change -> Used for changing time
+    #### IDEAS ####
+    # Menu:
+    ## Change -> Used for changing time
     ## Shows up on the 4 digit maybe, and if you go vertically with joystick it allows you to change it up or down.
     ## If you go horiz it changes HH to MM and vice versa.
     ## Indicates which is used by blinking the one that is being edited
     ## Asks if it is for one day or a permanent change
-## Skip -> Skips next day
+    ## Skip -> Skips next day
     ## Asks for confirmation
-## Settings:
+    ## Settings:
     ## Allows you to change the variables related to the game
     ## Change the volume of the alarm clock, with a preview sound playing
     ## Change the days it is active on, like below
@@ -197,8 +217,8 @@ while True:
 # Game:
 ## Picks between 3 games randomly:
 ## Math:
-    ## Puts a customizable amount of math problems to be solved.
+## Puts a customizable amount of math problems to be solved.
 ## Capitals:
-    ## Guess country capital with the abcd of the keypad.
+## Guess country capital with the abcd of the keypad.
 ## Memory:
-    ## Shows arrows on the LCD, you are required to memorize and do with joystick.
+## Shows arrows on the LCD, you are required to memorize and do with joystick.

@@ -1,3 +1,6 @@
+import random
+
+
 def sel_chr(num, options, sel, char=chr(0), other=" "):
     return (char if sel == num else other) + options[num]
 
@@ -180,3 +183,57 @@ class SettingsMenu:
 
     def handle_press(self, press):
         print("Press: " + str(press))
+
+
+class Game:
+    def __init__(self, display):
+        self.display = display
+        self.question_num = 1
+        self.question = ""
+        self.ipt = ""
+
+    def draw(self):
+        lcd = self.display
+
+        lcd.clear()
+        lcd.putstr("{:<16}".format(f"Question {self.question_num}."))
+        lcd.putstr(space_between(self.question.replace("**", "^"), self.ipt))
+
+    def generate_question(self, dt):
+        seed = int((dt[0] * (dt[1] / dt[2])) ** (dt[4] + dt[5] / dt[6]))
+        random.seed(seed)
+
+        print(seed)
+
+        sel_op = random.choice(["+", "-", "*", "/", "^"])
+        if sel_op == "+" or sel_op == "-":
+            a = random.randint(1, 100)
+            b = random.randint(1, 99 - a)
+            self.question = f"{a}{sel_op}{b}"
+        elif sel_op == "*":
+            a = random.randint(1, 50)
+            b = random.randint(1, 50 - a)
+            self.question = f"{a}{sel_op}{b}"
+        elif sel_op == "/":
+            a = random.randint(1, 50)
+            b = random.randint(1, 50 - a)
+            self.question = f"{a}{sel_op}{b}"
+        else:
+            a = random.randint(1, 9)
+            b = random.randint(1, 4 - a // 4)
+            self.question = f"{a}**{b}"
+
+        print(self.question, int(eval(self.question)))
+
+        random.seed(
+            seed ** random.randint(random.randint(0, 10), random.randint(10, 20))
+        )
+        sel_op = random.choice(["+", "-", "/"])
+        if sel_op == "+" or sel_op == "-":
+            b = random.randint(1, 99 - int(eval(self.question)))
+            self.question += f"{sel_op}{b}"
+        else:
+            b = random.randint(1, 15 - int(eval(self.question)))
+            self.question += f"{sel_op}{b}"
+
+        print(f"{self.question} {int(eval(self.question))}")
